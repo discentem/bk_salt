@@ -8,19 +8,28 @@ log = logging.getLogger(__name__)
 __virtualname__ = "apm"
 
 def __virtual__():
-    if salt.utils.platform.is_windows():
+    is_windows = salt.utils.platform.is_windows()
+    is_macOS = salt.utils.platform.is_darwin()
+    if is_windows or is_macOS:
         return __virtualname__
 
     return False
 
-default_apm_cmd = "C:\Program Files\Atom Beta\\resources\cli\\apm.cmd"
+def _apm_cmd():
+    # is_windows = salt.utils.platform.is_windows()
+    # is_macOS = salt.utils.platform.is_darwin()
+    # if is_windows:
+    #     apm_cmd = "C:\Program Files\Atom Beta\\resources\cli\\apm.cmd"
+    # elif is_darwin:
+    #     apm_cmd = '/usr/local/bin/apm'
+    return '/usr/local/bin/apm'#apm_cmd
 
 def extract_package_info(string):
     package = string.split('\n')[0]
     package_name, package_version = package.split('@')
     return { 'name' : package_name, 'version' : package_version }
 
-def list_packages(apm_cmd=default_apm_cmd,
+def list_packages(apm_cmd=_apm_cmd(),
                   with_categories=False):
 
     cmd = "{0} list".format(apm_cmd)
@@ -53,22 +62,31 @@ def list_packages(apm_cmd=default_apm_cmd,
 
     return packages
 
-def install(package, apm_cmd=default_apm_cmd):
+def _success_message(package, action="install"):
+    action = (action + 'ing').upper()
+    if salt.utils.platform.is_windows():
+        success = "{0} {0}".format(action, package) and "done"
+    elif salt.utils.platform.is_darwin():
+        success = "{0} {0}".format(action, package) and "✓"
+
+    return success
+
+def install(package, apm_cmd=_apm_cmd()):
     cmd = "{0} install {1}".format(apm_cmd, package)
     cmd_output = __salt__['cmd.run'](cmd)
 
-    success = "Installing {0}".format(package) and "done"
+    success = _success_message(package, action="install")
     if success in cmd_output:
         return True
     else:
         raise salt.exceptions.CommandExecutionError(
             cmd_output)
 
-def uninstall(package, apm_cmd=default_apm_cmd):
+def uninstall(package, apm_cmd=_apm_cmd()):
     cmd = "{0} uninstall {1}".format(apm_cmd, package)
     cmd_output = __salt__['cmd.run'](cmd)
 
-    success = "Uninstalling {0} done".format(package)
+    success = _success_message(package, action="uninstall")
     if cmd_output == success:
         return True
     else:

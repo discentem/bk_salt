@@ -6,18 +6,19 @@ log = logging.getLogger(__name__)
 __virtualname__ = "apm"
 
 def __virtual__():
-    if salt.utils.platform.is_windows():
-        return __virtualname__
+    return __virtualname__
 
-    return(False, "states.apm is currently only tested on windows")
-
-def packages_installed(name, packages):
+def package_installed(name, packages):
 
     ret = { 'name': name,
             'changes': {},
             'result': True,
             'comment': ''
     }
+
+    if isinstance(packages, str):
+        packages_string = packages
+        packages = [packages_string]
 
     current_packages = __salt__['apm.list_packages']()
     log.info("NAME:" + name)
@@ -35,23 +36,23 @@ def packages_installed(name, packages):
                 if current_packages[package_name] == package_version:
                     ret['comment'] += "{0} already installed\n".format(package)
                 else:
-                    install_attempt = __salt__['apm.install'](package)
-                    if install_attempt == True:
+                    install_successful = __salt__['apm.install'](package)
+                    if install_successful == True:
                         old_package = package_name + package_version
                         ret['changes'].update({package: { 'old': old_package,
                                                           'new': package}})
                     else:
                         ret['result'] = False
-                        ret['comment'].update({package: install_attempt})
+                        ret['comment'].update({package: install_successful})
                         break
 
         else:
-            install_attempt = __salt__['apm.install'](package)
-            if install_attempt == True:
+            install_successful = __salt__['apm.install'](package)
+            if install_successful == True:
                 ret['changes'].update({package: { 'old': '',
                                                   'new': package}})
             else:
                 ret['result'] = False
-                ret['comment'].update({package: install_attempt})
+                ret['comment'].update({package: install_successful})
 
     return ret

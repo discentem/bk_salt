@@ -4,17 +4,10 @@ def run():
     config = {}
 
     role = __salt__['grains.get']('role', None)
-    apm_packages = __salt__['pillar.get']("apm_packages:" + str(role), None)
-
-    id = 'list apm_packages'
-    config[id] = {
-        'test.show_notification': [
-          { 'text': apm_packages }
-        ]
-    }
+    apm_packages = __salt__['pillar.get']("apm_packages", None)
 
     config["install apm packages"] = {
-        'apm.packages_installed': [
+        'apm.package_installed': [
             { 'packages': apm_packages }
         ]
     }

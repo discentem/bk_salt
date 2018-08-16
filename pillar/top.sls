@@ -1,3 +1,3 @@
 base:
-  "G@os:Windows":
-    - windows
+  '*':
+    - {{ grains.get('role') }}

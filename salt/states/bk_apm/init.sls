@@ -8,7 +8,8 @@ def run():
     if apm_packages != None:
         config["install apm packages"] = {
             'apm.installed': [
-                { 'packages': apm_packages }
+                { 'packages': apm_packages },
+                { 'apm_cmd': "C:\Program Files\Atom Beta\\resources\cli\\apm.cmd" }
             ]
         }
 

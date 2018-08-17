@@ -1,14 +1,5 @@
 import salt.exceptions
 import logging
-import pprint
-import salt.loader
-
-log = logging.getLogger(__name__)
-__opts__ = salt.config.minion_config('/etc/salt/minion')
-__grains__ = salt.loader.grains(__opts__)
-__opts__['grains'] = __grains__
-__utils__ = salt.loader.utils(__opts__)
-__salt__ = salt.loader.minion_mods(__opts__, utils=__utils__)
 
 __virtualname__ = "apm"
 
@@ -20,12 +11,22 @@ def __virtual__():
 
     return False
 
+def _get_apm_cmd():
+    apm_cmd = __salt__['grains.filter_by']({
+        'default': '/usr/local/bin/apm',
+        'Windows': 'C:\Program Files\Atom Beta\Atom\\resources\cli\\apm.cmd'
+        },
+        grain='os_family'
+    )
+
+    return apm_cmd
+
 def extract_package_info(string):
     package = string.split('\n')[0]
     package_name, package_version = package.split('@')
     return { 'name' : package_name, 'version' : package_version }
 
-def list_packages(apm_cmd,
+def list_packages(apm_cmd=_get_apm_cmd(),
                   with_categories=False):
 
     cmd = "{0} list".format(apm_cmd)
@@ -67,7 +68,7 @@ def _success_message(package, action="install"):
 
     return success
 
-def install(apm_cmd, package):
+def install(package, apm_cmd= _get_apm_cmd()):
     cmd = "{0} install {1}".format(apm_cmd, package)
     cmd_output = __salt__['cmd.run'](cmd)
 
@@ -78,7 +79,7 @@ def install(apm_cmd, package):
         raise salt.exceptions.CommandExecutionError(
             cmd_output)
 
-def uninstall(apm_cmd, package):
+def uninstall(package, apm_cmd= _get_apm_cmd()):
     cmd = "{0} uninstall {1}".format(apm_cmd, package)
     cmd_output = __salt__['cmd.run'](cmd)
 

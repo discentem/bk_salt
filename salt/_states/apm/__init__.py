@@ -1,17 +1,28 @@
-import salt.utils.platform
 import logging
-
+import salt.exceptions
 log = logging.getLogger(__name__)
 
 __virtualname__ = "apm"
 
 def __virtual__():
-    if salt.utils.platform.is_windows():
-        return __virtualname__
+    return __virtualname__
 
-    return(False, "states.apm is currently only tested on windows")
+def _get_apm_cmd():
+    if 'apm_cmd' in __context__:
+        return __context__['apm_cmd']
+    __context__['apm_cmd'] = __salt__['grains.filter_by']({
+        'default': '/usr/local/bin/apm',
+        'Windows': 'C:\Program Files\Atom Beta\Atom\\resources\cli\\apm.cmd'
+        },
+        grain='os_family'
+    )
 
-def packages_installed(name, packages):
+    return __context__['apm_cmd']
+
+def installed(name, packages, apm_cmd=None):
+
+    if apm_cmd == None:
+        apm_cmd = _get_apm_cmd()
 
     ret = { 'name': name,
             'changes': {},
@@ -19,10 +30,12 @@ def packages_installed(name, packages):
             'comment': ''
     }
 
-    current_packages = __salt__['apm.list_packages']()
-    log.info("NAME:" + name)
+    if isinstance(packages, str):
+        packages_string = packages
+        packages = [packages_string]
+
+    current_packages = __salt__['apm.list_packages'](apm_cmd=apm_cmd)
     for package in packages:
-        log.info(package)
         try:
             package_name, package_version = package.split('@')
         except:
@@ -35,23 +48,24 @@ def packages_installed(name, packages):
                 if current_packages[package_name] == package_version:
                     ret['comment'] += "{0} already installed\n".format(package)
                 else:
-                    install_attempt = __salt__['apm.install'](package)
-                    if install_attempt == True:
+                    install_success = __salt__['apm.install'](package,
+                                                              apm_cmd=apm_cmd)
+                    if install_success == True:
                         old_package = package_name + package_version
                         ret['changes'].update({package: { 'old': old_package,
                                                           'new': package}})
                     else:
                         ret['result'] = False
-                        ret['comment'].update({package: install_attempt})
-                        break
+                        ret['comment'].update({package: install_success})
 
         else:
-            install_attempt = __salt__['apm.install'](package)
-            if install_attempt == True:
+            install_success = __salt__['apm.install'](package,
+                                                      apm_cmd=apm_cmd)
+            if install_success == True:
                 ret['changes'].update({package: { 'old': '',
                                                   'new': package}})
             else:
                 ret['result'] = False
-                ret['comment'].update({package: install_attempt})
+                ret['comment'].update({package: install_success})
 
     return ret

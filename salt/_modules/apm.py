@@ -94,7 +94,7 @@ def uninstall(package, apm_cmd=None):
     cmd_output = __salt__['cmd.run'](cmd)
 
     success = _success_message(package, action="uninstall")
-    if cmd_output == success:
+    if success in cmd_output:
         return True
     else:
         raise salt.exceptions.CommandExecutionError(

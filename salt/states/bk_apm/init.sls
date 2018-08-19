@@ -9,8 +9,15 @@ def run():
         config["install apm packages"] = {
             'apm.installed': [
                 { 'packages': apm_packages },
-                { 'apm_cmd': "C:\Program Files\Atom Beta\\resources\cli\\apm.cmd" }
+                { 'apm_cmd': "C:\Program Files\Atom Beta\\resources\cli\\apm.cmd" },
+                { 'hard': True }
             ]
         }
+        # config['uninstall apm packages'] = {
+        #     'apm.uninstalled': [
+        #         { 'packages': apm_packages },
+        #         { 'apm_cmd': "C:\Program Files\Atom Beta\\resources\cli\\apm.cmd" }
+        #     ]
+        # }
 
     return config

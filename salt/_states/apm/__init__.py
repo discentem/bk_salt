@@ -20,6 +20,13 @@ def _get_apm_cmd():
     return __context__['apm_cmd']
 
 def installed(name, packages, apm_cmd=None):
+def _ensure_packages_is_array(packages):
+    if isinstance(packages, str):
+        packages_string = packages
+        packages = [packages_string]
+    return packages
+
+def installed(name, packages, apm_cmd=None, hard=False):
 
     if apm_cmd == None:
         apm_cmd = _get_apm_cmd()
@@ -30,9 +37,6 @@ def installed(name, packages, apm_cmd=None):
             'comment': ''
     }
 
-    if isinstance(packages, str):
-        packages_string = packages
-        packages = [packages_string]
 
     current_packages = __salt__['apm.list_packages'](apm_cmd=apm_cmd)
     for package in packages:

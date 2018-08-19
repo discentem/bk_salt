@@ -19,7 +19,6 @@ def _get_apm_cmd():
 
     return __context__['apm_cmd']
 
-def installed(name, packages, apm_cmd=None):
 def _ensure_packages_is_array(packages):
     if isinstance(packages, str):
         packages_string = packages
@@ -37,8 +36,28 @@ def installed(name, packages, apm_cmd=None, hard=False):
             'comment': ''
     }
 
+    packages = _ensure_packages_is_array(packages)
 
-    current_packages = __salt__['apm.list_packages'](apm_cmd=apm_cmd)
+    if hard:
+        current_packages = __salt__['apm.list_packages'](apm_cmd=apm_cmd,
+                                                         with_categories=True)
+        current_packages = current_packages['Community Packages']
+        for current_package in current_packages:
+            if current_package not in packages:
+                uninstall_success = __salt__['apm.uninstall'](current_package,
+                                                              apm_cmd=apm_cmd)
+                if uninstall_success == True:
+                    ret['changes'].update({current_package: { 'old': current_package,
+                                                      'new': ''}})
+                    msg = "{0} uninstalled due to apm.installed(hard=True) in state"
+                    ret['comment'] += msg.format(current_package) + '\n'
+                else:
+                    ret['result'] = False
+                    ret['comment'] += "{0} {1}\n".format(current_package, uninstall_success)
+
+    elif hard == False:
+        current_packages = __salt__['apm.list_packages'](apm_cmd=apm_cmd,
+                                                         with_categories=False)
     for package in packages:
         try:
             package_name, package_version = package.split('@')

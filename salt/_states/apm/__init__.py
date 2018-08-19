@@ -69,3 +69,52 @@ def installed(name, packages, apm_cmd=None):
                 ret['comment'].update({package: install_success})
 
     return ret
+
+def uninstalled(name, packages, apm_cmd=None):
+    if apm_cmd == None:
+        apm_cmd = _get_apm_cmd()
+
+    ret = { 'name': name,
+            'changes': {},
+            'result': True,
+            'comment': ''
+    }
+
+    packages = _ensure_packages_is_array(packages)
+    current_packages = __salt__['apm.list_packages'](apm_cmd=apm_cmd,
+                                                     with_categories=False)
+
+    for package in packages:
+        try:
+            package_name, package_version = package.split('@')
+        except:
+            package_name = package
+            package_version = None
+        if package_name in current_packages:
+            if package_version == None:
+                uninstall_success = __salt__['apm.uninstall'](package,
+                                                              apm_cmd=apm_cmd)
+                if uninstall_success == True:
+                    ret['changes'].update({package: { 'old': package,
+                                                      'new': ''}})
+                else:
+                    ret['result'] = False
+                    ret['comment'].update({package: install_success})
+            elif package_version != None:
+                if current_packages[package_name] == package_version:
+                    uninstall_success = __salt__['apm.uninstall'](package,
+                                                                  apm_cmd=apm_cmd)
+                    if uninstall_success == True:
+                        ret['changes'].update({package: { 'old': package,
+                                                          'new': ''}})
+                    else:
+                        ret['changes'].update({package: { 'old': '',
+                                                          'new': ''}})
+                        ret['result'] = False
+                        ret['comment'].update({package: install_success})
+                else:
+                    ret['comment'] += "{0} not installed\n".format(package_name)
+        else:
+            ret['comment'] += "{0} not installed\n".format(package)
+
+    return ret

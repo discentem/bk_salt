@@ -1,3 +1,7 @@
-apm_packages:
-  - "shebang-set-grammar"
-  - "atom-salt"
+#!py
+
+def run():
+  apm_packages = {
+    'shebang-set-grammar': True,
+    # 'atom-salt': True
+  }

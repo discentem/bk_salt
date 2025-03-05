@@ -1,5 +1,9 @@
 ### Basic Usage
 
-On Windows, clone this repository to `c:\salt\`. This is the default path for Salt files.
+- cd into `bk_salt`
 
-The default on other systems is usually `\srv\`.
+- Run salt-call: 
+    
+    ```bash
+    sudo /opt/salt/salt-call --local state.apply --file-root=$(pwd)/salt --pillar-root=$(pwd)/pillar -l debug saltenv=base
+    ```

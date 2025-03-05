@@ -1,5 +1,3 @@
-import os
-
 def managed(name):
 
     ret = {

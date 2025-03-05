@@ -1,0 +1,20 @@
+{
+  "name": "py-shebang-salt",
+  "displayName": "py-shebang-salt",
+  "description": "Automatically detects shebangs like #!py as Python",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "python",
+        "aliases": ["Python"],
+        "extensions": [],
+        "firstLine": "^#!\\s*py"
+      }
+    ]
+  }
+}
+  

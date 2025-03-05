@@ -38,7 +38,7 @@ def managed(name):
         final_hosts_file = __states__['file.managed'](hosts_path,
                                                       contents=lines, test=True)
         ret['changes'] = final_hosts_file['changes']
-        if ret['changes'].has_key('diff'):
+        if 'diff' in ret['changes']:
             ret['result'] = None
             ret['comment'] = "{0} would have been updated. See diff.".format(hosts_path)
         else:
@@ -49,7 +49,7 @@ def managed(name):
         final_hosts_file = __states__['file.managed'](hosts_path,
                                                   contents=lines)
         ret['changes'] = final_hosts_file['changes']
-        if ret['changes'].has_key('diff'):
+        if 'diff' in ret['changes']:
             ret['comment'] = "{0} was updated. See diff.".format(hosts_path)
         else:
             ret['comment'] = "{0} is in the correct state.".format(hosts_path)

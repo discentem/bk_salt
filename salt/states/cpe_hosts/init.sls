@@ -3,6 +3,6 @@
 def run():
     config = {}
     config['manage hosts'] = {
-        'bk_hosts.managed': [] # needs to be empty list
+        'cpe_hosts.managed': [] # needs to be empty list
     }
     return config

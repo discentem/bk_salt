@@ -1,4 +1,10 @@
-base:
-  "*":
-    - states.hello
-    - states.hosts
+#!py
+
+def run():
+  return {
+    'base': {
+      '*': [
+        'states.cpe_init',
+      ],
+    },
+  }

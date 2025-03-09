@@ -2,7 +2,7 @@
 
 def run():
     pillar = {
-        'touchid': {
+        'cpe_touchid': {
             'enabled': True,
         },
         'cpe_hosts': {
@@ -17,6 +17,6 @@ def run():
             'default' : ['thing']
         }
     if __grains__['os_family'] == 'Windows':
-        pillar['touchid']['enabled'] = False
+        pillar['cpe_touchid']['enabled'] = False
 
     return pillar

@@ -2,9 +2,9 @@
 
 def run():
     return {
-        "sync_utilities": {
+        "sync all": {
             "module.run": [
-                {"name": "saltutil.sync_modules"}, 
+                {"name": "saltutil.sync_all"}, 
                 {"kwargs": {"refresh": True}}
             ]
         }

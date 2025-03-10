@@ -5,7 +5,7 @@
 1. Run salt locally: 
     
     ```bash
-    sudo /opt/salt/salt-call --local state.apply --file-root=$(pwd)/salt --pillar-root=$(pwd)/pillar --module-dir=$(pwd)/salt/_modules -l debug saltenv=base
+    sudo /opt/salt/salt-call --local state.apply --file-root=$(pwd)/salt --pillar-root=$(pwd)/pillar --module-dir=$(pwd)/salt/_modules -l debug saltenv=base --config=$(pwd)/salt
     ```
 
 # Repository Layout
